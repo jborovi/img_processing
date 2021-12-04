@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  module_color:
+    environment:
+      - WORKER_ID=w1
+  module_rgba:
+    environment:
+      - WORKER_ID=w1

@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  unit_tests:
+    build:
+      context: ./modules
+      dockerfile: ./unit_tests/Dockerfile
+    command: ["--log-cli-level=DEBUG",
+              "--cov=module_input",
+              "--cov=module_rgba",
+              "--cov=module_color",
+              "--cov=img_processing_common",
+              "/tests",
+              "--cov-report",
+              "term-missing"]
+#    command: ["tail", "-f", "/dev/null"]
+    logging:
+      driver: json-file
+    depends_on:
+      - redis_tests
+    networks:
+      - redis_tests
+  redis_tests:
+    image: redis:latest
+    networks:
+      - redis_tests
+    logging:
+      driver: json-file
+networks:
+    redis_tests:
+        driver: bridge

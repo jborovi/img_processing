@@ -1,0 +1,73 @@
+version: "3.8"
+services:
+  module_input:
+    build:
+      context: ./modules
+      dockerfile: ./module_input/Dockerfile
+    volumes:
+      - input-volume:${SHARED_VOLUME}
+    networks:
+      - redis
+    logging:
+      driver: ${LOGGING_DRIVER}
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  module_color:
+    build:
+      context: ./modules
+      dockerfile: ./module_color/Dockerfile
+    volumes:
+      - input-volume:${SHARED_VOLUME}
+    networks:
+      - redis
+    logging:
+      driver: ${LOGGING_DRIVER}
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  module_rgba:
+    build:
+      context: ./modules
+      dockerfile: ./module_rgba/Dockerfile
+    volumes:
+      - input-volume:${SHARED_VOLUME}
+    networks:
+      - redis
+    logging:
+      driver: ${LOGGING_DRIVER}
+    env_file:
+      - .env
+    environment:
+      - WORKER_ID=w1
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    networks:
+      - redis
+
+  img_processing_server:
+    build:
+      context: ./modules/img_processing_server
+    ports:
+      - "127.0.0.1:${SERVER_HTTP_PORT}:8080"
+    volumes:
+      - input-volume:${SHARED_VOLUME}
+    logging:
+      driver: ${LOGGING_DRIVER}
+    env_file:
+      - .env
+    environment:
+      - SHARED_VOLUME=${SHARED_VOLUME}
+      - DIR_INPUT=${DIR_INPUT}
+    restart: unless-stopped
+volumes:
+     input-volume:
+       name: input-volume
+
+networks:
+    redis:
+        driver: bridge

@@ -1,0 +1,3 @@
+webcolors
+Pillow
+redis
