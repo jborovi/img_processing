@@ -1,14 +1,18 @@
 import os
 import typing
 
+import cv2
 import numpy as np
-from PIL import Image
+from img_processing_common.logger import logger
 
 
 def get_image_rgba(
     path: typing.Union[str, bytes, os.PathLike], alpha_value_threshold: int
 ) -> np.ndarray:
-    arr = np.array(Image.open(path).convert("RGBA"))
+    if not os.path.isfile(path):
+        raise FileNotFoundError
+    arr = cv2.cvtColor(cv2.imread(path, flags=cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2RGBA)
+    #    arr = np.array(Image.open(path).convert("RGBA"))
     return remove_transparent_pixels(arr, alpha_value_threshold)
 
 

@@ -11,10 +11,10 @@ import os
 import typing
 import uuid
 
+import cv2
 import redis
 from img_processing_common.logger import logger
 from img_processing_common.messaging import send_message
-from PIL import Image, UnidentifiedImageError
 
 from .utils_file import files_in_path, get_digest
 
@@ -43,14 +43,17 @@ def process_inputs(path: typing.Union[str, bytes, os.PathLike]) -> None:
     for file_id in files_in_path(os.path.join(path)):
         try:
             sha_256 = get_digest(os.path.join(path, file_id))
-            Image.open(os.path.join(path, file_id)).convert("RGBA")
+            cv2.cvtColor(
+                cv2.imread(os.path.join(path, file_id), flags=cv2.IMREAD_UNCHANGED),
+                cv2.COLOR_BGR2RGBA,
+            )
         except FileNotFoundError:
             logger.error("received file which does not exist %s", file_id)
             continue
-        except (UnidentifiedImageError, OSError) as exception:
+        except cv2.error as cv2_error:
             os.remove(os.path.join(path, file_id))
-            logger.error("received malformed file %s", path)
-            logger.error(str(exception))
+            logger.error("received not supported format file %s", sha_256)
+            logger.error(str(cv2_error))
             continue
 
         logger.info("received file sha256 hash %s", sha_256)

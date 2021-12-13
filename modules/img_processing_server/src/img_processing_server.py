@@ -5,14 +5,12 @@ http interface for project
 
 import asyncio
 import base64
-import io
 import json
 import logging
 import os
 from hashlib import sha256
 
 from aiohttp import web
-from PIL import Image, UnidentifiedImageError
 
 DATA_SOURCE = os.path.join(
     os.getenv("SHARED_VOLUME", "/tmp/images"),
@@ -31,18 +29,8 @@ async def upload_image(request):
     img_bytes = base64.b64decode(im_b64["image"].encode("utf-8"))
     sha_256 = sha256()
     sha_256.update(img_bytes)
-    # convert bytes data to PIL Image object
-    status = 500
-    response_body = bytes(json.dumps({"error:": "unknown"}), "utf-8")
-    try:
-        Image.open(io.BytesIO(img_bytes))
-        status = 200
-        response_body = bytes(
-            json.dumps({"image_sha": str(sha_256.hexdigest())}), "utf-8"
-        )
-    except UnidentifiedImageError:
-        response_body = bytes(json.dumps({"error": "Not image"}), "utf-8")
-        status = 400
+    status = 200
+    response_body = bytes(json.dumps({"image_sha": str(sha_256.hexdigest())}), "utf-8")
     try:
         os.mkdir(DATA_SOURCE)
     except FileExistsError:

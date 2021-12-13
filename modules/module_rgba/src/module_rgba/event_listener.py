@@ -11,6 +11,7 @@ import asyncio
 import json
 import os
 
+import cv2
 import redis
 from img_processing_common.conf import DATA_PROCESS
 from img_processing_common.logger import logger

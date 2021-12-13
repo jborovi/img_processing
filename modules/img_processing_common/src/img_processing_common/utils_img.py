@@ -5,7 +5,7 @@ Shared functions to validate input file
 import os
 import typing
 
-from PIL import Image, UnidentifiedImageError
+import cv2
 
 from .logger import logger
 from .messaging import remove_msg
@@ -13,9 +13,11 @@ from .messaging import remove_msg
 
 def is_image(path: typing.Union[str, bytes, os.PathLike]) -> True:
     try:
-        Image.open(path).convert("RGBA")
+        if not os.path.isfile(path):
+            raise FileNotFoundError
+        cv2.cvtColor(cv2.imread(path, flags=cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2RGBA)
         return True
-    except (UnidentifiedImageError, FileNotFoundError, OSError):
+    except (cv2.error, FileNotFoundError):
         return False
 
 

@@ -63,11 +63,11 @@ and shared volume between containers
 
   i tested for following formats
   - jpeg
-  - jpeg200
   - bmp
+  - pbm
   - png
   - tif
-  - dds
+
 
 project is logging via driver: json-file
 you should see output in your console
