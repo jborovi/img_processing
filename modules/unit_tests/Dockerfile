@@ -1,7 +1,8 @@
 FROM ubuntu:20.04 as opencv
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Prague
-RUN apt update && apt install libopencv-dev python3-opencv python3-pip -y
+RUN apt update
+RUN apt install libopencv-dev python3-opencv python3-pip -y
 FROM opencv as unit_tests
 COPY ./img_processing_common/src /app_common
 COPY ./img_processing_common/requirements.txt /app_common/
